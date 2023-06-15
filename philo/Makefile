@@ -16,6 +16,7 @@ NAME		= philo
 # Compiler
 CC			= cc
 CFLAGS		= -Werror -Wextra -Wall
+SANIFLAG	= -fsanitize=thread -g
 
 # Includes & Linking
 INC			= -I ./includes
@@ -23,7 +24,7 @@ LINK		= -lpthread
 
 # Sources
 SRC_PATH	= srcs/
-SRC_FILE	= main.c
+SRC_FILE	= check_input.c exit_philo.c init.c main.c output.c utils.c
 SRC			= $(addprefix $(SRC_PATH), $(SRC_FILE))
 
 # Objects
@@ -39,6 +40,11 @@ $(NAME): $(OBJ)
 	@echo "Compiling philo..."
 	@-$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(INC) $(LINK)
 	@echo "\n\t\033[33;1;3mphilo ready\033[0m\n"
+
+SANITIZE: $(OBJ)
+	@echo "Compiling philo with fsanitize flag..."
+	@-$(CC) $(CFLAGS) $(SANIFLAG) -o $(NAME) $(OBJ) $(INC) $(LINK)
+	@echo "\n\t\033[33;1;3mphilo ready (with fsanitize)\033[0m\n"
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	@$(CC) $(CFLAGS) -c $< -o $@ $(INC)
