@@ -22,11 +22,30 @@ void	print_table(t_table *table)
 	i = 0;
 	while (i < table->n_philos)
 	{
-		printf("Philo %u/%u: n_meals=%u | t_last_meal=%llu\n", i, table->philos[i]->id, table->philos[i]->n_meals, table->philos[i]->t_last_meal);
+		printf("Philo %u/%u: n_meals=%u | forks=[%u, %u]\n", i, table->philos[i]->id, table->philos[i]->n_meals, table->philos[i]->fork[0], table->philos[i]->fork[1]);
 		if (table != (table->philos[i]->table))
 			printf("Error address table\n");
 		i++;
 	}
+}
+
+/* simulation:
+*	
+*/
+bool	simulation(t_table *table)
+{
+	unsigned int	i;
+
+	table->t_start = get_time_ms();
+	i = 0;
+	while (i < table->n_philos)
+	{
+		if (pthread_create(&table->philos[i]->thread, NULL,
+				&philosopher, table->philos[i]))
+			return (error_free(STR_ERR_THREAD, NULL, NULL, table), false);
+		i++;
+	}
+	// ...
 }
 
 int	main(int argc, char **argv)
@@ -39,8 +58,9 @@ int	main(int argc, char **argv)
 	table = init_table(argc, argv);
 	if (!table)
 		return (EXIT_FAILURE);
-	print_table(table);
-	//if (!start)
-
+	//print_table(table);
+	if (!simulation(table))
+		return (EXIT_FAILURE);
+	// stop simulation
 	return (EXIT_SUCCESS);
 }

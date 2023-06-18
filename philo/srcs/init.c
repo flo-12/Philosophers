@@ -12,6 +12,31 @@
 
 #include "philo.h"
 
+/* assign_forks:
+*	Assigns the index of two forks to the Philosopher. The index refers to
+*	the forks the Philosopher picks up to eat - and their order.
+*	Even-numbered Philosophers first pick up the left fork and then the
+*	right fork and uneven-numbered Philosophers vice-versa.
+*	This order is important to not get a deadlock in case that all Philosophers
+*	want to eat at the same time, pick up first the left fork and can't pick
+*	up the right fork because it's taken by the Philosopher to their right.
+*	This method guarantees abn asynchronic lock of the forks and avoids
+*	deadlocks.
+*/
+void	assign_forks(t_philo *philo, unsigned int n_philos)
+{
+	if (philo->id % 2 == 0)
+	{
+		philo->fork[0] = philo->id;
+		philo->fork[1] = (philo->id + 1) % n_philos;
+	}
+	else
+	{
+		philo->fork[0] = (philo->id + 1) % n_philos;;
+		philo->fork[1] = philo->id;
+	}	
+}
+
 /* init_philos:
 *	Allocates the memory for each Philosopher and initializes
 *	their values (as far as known).
@@ -35,6 +60,7 @@ t_philo	**init_philos(t_table *table)
 		philos[i]->id = i;
 		philos[i]->n_meals = 0;
 		philos[i]->table = table;
+		assign_forks(philos[i], table->n_philos);
 		i++;
 	}
 	return (philos);
@@ -58,6 +84,27 @@ unsigned int	atoi_uint(char *str)
 	return (nbr);
 }
 
+/* init_mutex_table:
+*	Allocates memory and initializes the Mutexes of the struct t_table.
+*	Return false in case of error and true in case of success.
+*/
+bool	init_mutex_table(t_table *table)
+{
+	unsigned int		i;
+
+	table->forks = malloc(sizeof(pthread_mutex_t) * table->n_philos);
+	if (!table->forks)
+		return (false);
+	i = 0;
+	while (i < table->n_philos)
+	{
+		if (pthread_mutex_init(&table->forks[i], 0))
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
 /* init_table:
 *	Initialize the table struct with the user input containing
 *	the program's parameters and initializing the other
@@ -79,6 +126,8 @@ t_table	*init_table(int argc, char **argv)
 	table->time_to_sleep = atoi_uint(argv[4]);
 	if (argc == 6)
 		table->n_min_meals = atoi_uint(argv[5]);
+	if (!init_mutex_table(table))
+		return (error_free(STR_ERR_MUTEX, NULL, NULL, table), NULL);
 	table->philos = init_philos(table);
 	if (!table->philos)
 		return (NULL);

@@ -67,6 +67,7 @@ typedef struct s_philo
 	unsigned int		id;
 	unsigned int		n_meals;
 	unsigned long long	t_last_meal;
+	unsigned int		fork[2];	// uninitialized
 	t_table				*table;
 }	t_philo;
 
@@ -79,6 +80,8 @@ typedef struct s_table
 	unsigned int		time_to_sleep;
 	unsigned int		n_min_meals;
 	bool				died;
+	pthread_t			meal_obs;
+	pthread_mutex_t		*forks;
 	t_philo				**philos;
 }	t_table;
 
@@ -87,18 +90,21 @@ typedef struct s_table
 **************************************************************************/
 
 // exit_philo.c
-void	error_free(char *str, char *arg1, char *arg2, t_table *table);
+void				error_free(char *str, char *arg1, char *arg2, t_table *table);
 
 // output.c
-void	msg(char *str, char *arg1, char *arg2);
+void				msg(char *str, char *arg1, char *arg2);
 
 // init.c
-t_table	*init_table(int argc, char **argv);
+t_table				*init_table(int argc, char **argv);
 
 // check_input.c
-bool	is_valid_input(int argc, char **argv);
+bool				is_valid_input(int argc, char **argv);
+
+// time.c
+unsigned long long	get_time(void);
 
 // utils.c
-int		ft_strlen(char *str);
+int					ft_strlen(char *str);
 
 #endif
