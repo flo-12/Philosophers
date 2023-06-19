@@ -25,3 +25,14 @@ void	msg(char *str, char *arg1, char *arg2)
 	else
 		printf(str, arg1, arg2);
 }
+
+/* print_state:
+*	Prints the state with the status message in str and using
+*	a mutex_lock/unlock to access the t_start variable.
+*/
+void	print_state(char *str, t_philo *philo)
+{
+	pthread_mutex_lock(&philo->table->mutex_time);
+	printf(str, get_time_ms() - philo->table->t_start, philo->id);
+	pthread_mutex_unlock(&philo->table->mutex_time);
+}

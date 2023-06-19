@@ -12,6 +12,20 @@
 
 #include "philo.h"
 
+/*
+CHECK AGAIN:
+	* in while loop in philosopher-fct: break if stop_sim is true
+	* check mutexes in structs and think about which ones are necessary
+		* mutex for time calculations in print_state
+		* mutex to write state messages (avoid mixing up state messages)
+		* necessary:
+			- mutex_write_output (to print each state message)
+			- mutex_forks (to lock each fork)
+			- mutex_eat_enough (in table for each philo to mark if it ate enough)
+			- mutex_n_eat (for the table_obs to check if a philo died of starvation)
+	* break the eat/think/sleep routine if a philo dies of starvation
+*/
+
 void	print_table(t_table *table)
 {
 	unsigned int	i;
@@ -29,14 +43,16 @@ void	print_table(t_table *table)
 	}
 }
 
-/* simulation:
-*	
+/* init_simulation:
+*	Initialize/Create all the threads for the simulation.
+*	Return false in case of error and print error message and
+*	otherwise true.
 */
-bool	simulation(t_table *table)
+bool	init_simulation(t_table *table)
 {
 	unsigned int	i;
 
-	table->t_start = get_time_ms();
+	set_start_time(table);
 	i = 0;
 	while (i < table->n_philos)
 	{
@@ -45,7 +61,10 @@ bool	simulation(t_table *table)
 			return (error_free(STR_ERR_THREAD, NULL, NULL, table), false);
 		i++;
 	}
-	// ...
+	// ... create meal_obs (to observe the state of the tables and stop the simulation)
+	i = -1;
+	while (++i < table->n_philos)
+		pthread_join(table->philos[i]->thread, NULL);
 }
 
 int	main(int argc, char **argv)
@@ -59,7 +78,7 @@ int	main(int argc, char **argv)
 	if (!table)
 		return (EXIT_FAILURE);
 	//print_table(table);
-	if (!simulation(table))
+	if (!init_simulation(table))
 		return (EXIT_FAILURE);
 	// stop simulation
 	return (EXIT_SUCCESS);

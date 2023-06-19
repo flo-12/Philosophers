@@ -24,7 +24,9 @@ LINK		= -lpthread
 
 # Sources
 SRC_PATH	= srcs/
-SRC_FILE	= check_input.c exit_philo.c init.c main.c output.c utils.c
+SRC_FILE	= check_input.c exit_philo.c init.c main.c \
+				output.c philosopher.c table_obs.c \
+				time.c utils.c
 SRC			= $(addprefix $(SRC_PATH), $(SRC_FILE))
 
 # Objects

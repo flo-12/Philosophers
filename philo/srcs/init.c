@@ -102,6 +102,10 @@ bool	init_mutex_table(t_table *table)
 			return (false);
 		i++;
 	}
+	if (pthread_mutex_init(&table->mutex_stop_sim, 0))
+		return (false);
+	if (pthread_mutex_init(&table->mutex_time, 0))
+		return (false);
 	return (true);
 }
 
@@ -125,7 +129,13 @@ t_table	*init_table(int argc, char **argv)
 	table->time_to_eat = atoi_uint(argv[3]);
 	table->time_to_sleep = atoi_uint(argv[4]);
 	if (argc == 6)
+	{
 		table->n_min_meals = atoi_uint(argv[5]);
+		if (table->n_min_meals == 0)
+			return (error_free(STR_SUC_0MEAL, NULL, NULL), NULL);
+	}
+	else
+		table->n_min_meals = 0;
 	if (!init_mutex_table(table))
 		return (error_free(STR_ERR_MUTEX, NULL, NULL, table), NULL);
 	table->philos = init_philos(table);
