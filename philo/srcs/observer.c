@@ -40,3 +40,8 @@ bool	get_stop_sim(t_table *table)
 	pthread_mutex_unlock(&table->mutex_stop_sim);
 	return (state);
 }
+
+void	*observer(void *arg)
+{
+	
+}

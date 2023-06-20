@@ -98,28 +98,26 @@ typedef struct s_table
 typedef struct s_philo
 {
 	pthread_t			thread;
-	unsigned int		id;
+	unsigned int		id;				// print state
 	unsigned int		n_meals;		// [obs] detect -> stop_sim
 	unsigned long long	t_last_meal;	// [obs] detect starvation -> stop_sim
+
 	unsigned long long	t_start;
-	unsigned long long	time_to_eat;
-	unsigned long long	time_to_sleep;
+	int					n_philos;
+	unsigned int		time_to_eat;
+	unsigned int		time_to_sleep;
 	pthread_mutex_t		fork[2];
-	t_gen_info			*gen_info;
-	t_mutex				*mutexes;
+	t_table				*table;
 }	t_philo;
 
-typedef struct s_observer
+typedef struct s_obs
 {
-	pthread_t			thread;
-	int					n_philos;
+	pthread_t			observer;	// not initialized
 	int					n_min_meals;
-	unsigned long long	t_start;
-	//unsigned int		time_to_die;
-	unsigned long long	time_to_die;
+	unsigned int		time_to_die;
 	t_mutex				*mutexes;
 	t_gen_info			*gen_info;
-}	t_observer;
+}	t_obs;
 
 typedef struct gen_info
 {
@@ -137,13 +135,11 @@ typedef struct s_mutex
 }	t_mutex;
 
 typedef struct s_table
-{
-	unsigned long long	t_start;
-	int					n_philos;
-	t_obs				*observer;
-	t_mutex				*mutexes;
-	t_philo				**philos;
-	t_gen_info			*gen_info;
+{	
+	t_obs		*obs;
+	t_mutex		*mutexes;
+	t_philo		**philos;
+	t_gen_info	*gen_info;
 }	t_table;
 
 
