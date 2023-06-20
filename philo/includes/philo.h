@@ -63,37 +63,20 @@ typedef enum e_bool
 	true = 1
 }	bool;
 
-typedef struct s_table	t_table;
-
-typedef struct s_philo
+typedef struct gen_info
 {
-	pthread_t			thread;
-	unsigned int		id;				// print state
-	unsigned int		n_meals;		// [obs] detect -> stop_sim
-	unsigned long long	t_last_meal;	// [obs] detect starvation -> stop_sim
-	unsigned int		fork[2];
-	t_table				*table;
-}	t_philo;
-
-typedef struct s_table
-{
-	unsigned long long	t_start;
-	int					n_philos;
-	unsigned int		time_to_die;
-	unsigned int		time_to_eat;
-	unsigned int		time_to_sleep;
-	int					n_min_meals;
+	unsigned int		*n_meals;
+	unsigned long long	*t_last_meal;
 	bool				stop_sim;		// if philo is dead or all philos had enough meals
+}	t_gen_info;
+
+typedef struct s_mutex
+{
 	pthread_mutex_t		mutex_stop_sim;		// for stop_sim
 	pthread_mutex_t		mutex_time;			// for t_start and t_last_meal
 	pthread_mutex_t		mutex_print;		// to print state message (printf)
-	pthread_t			observer;	// not initialized
 	pthread_mutex_t		*forks;
-	t_philo				**philos;
-}	t_table;
-
-
-
+}	t_mutex;
 
 typedef struct s_philo
 {
@@ -121,21 +104,6 @@ typedef struct s_observer
 	t_gen_info			*gen_info;
 }	t_observer;
 
-typedef struct gen_info
-{
-	unsigned int		*n_meals;
-	unsigned long long	*t_last_meal;
-	bool				stop_sim;		// if philo is dead or all philos had enough meals
-}	t_gen_info;
-
-typedef struct s_mutex
-{
-	pthread_mutex_t		mutex_stop_sim;		// for stop_sim
-	pthread_mutex_t		mutex_time;			// for t_start and t_last_meal
-	pthread_mutex_t		mutex_print;		// to print state message (printf)
-	pthread_mutex_t		*forks;
-}	t_mutex;
-
 typedef struct s_table
 {
 	unsigned long long	t_start;
@@ -145,13 +113,6 @@ typedef struct s_table
 	t_philo				**philos;
 	t_gen_info			*gen_info;
 }	t_table;
-
-
-
-
-
-
-
 
 /**************************************************************************
 *                               FUNCTIONS                                 *
