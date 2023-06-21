@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "../includes/philo.h"
 
 /*
 CHECK AGAIN:
@@ -28,50 +28,62 @@ CHECK AGAIN:
 
 void	print_table(t_table *table)
 {
-	unsigned int	i;
+	int	i;
 
 	printf("VALUES OF T_TABLE:\n");
-	printf("n_philos=%u | time_to_die=%u | time_to_eat=%u | time_to_sleep=%u | n_min_meals=%u | died=%u\n", table->n_philos, table->time_to_die, table->time_to_eat, table->time_to_sleep, table->n_min_meals, table->died);
+	printf("n_philos=%d\n", table->n_philos);
 	
 	i = 0;
 	while (i < table->n_philos)
 	{
-		printf("Philo %u/%u: n_meals=%u | forks=[%u, %u]\n", i, table->philos[i]->id, table->philos[i]->n_meals, table->philos[i]->fork[0], table->philos[i]->fork[1]);
-		if (table != (table->philos[i]->table))
-			printf("Error address table\n");
+		if (i == 0 || i + 1 == table->n_philos)
+			printf("PHILO VALUES: id=%u | n_meals=%u | time_to_eat=%llu | time_to_sleep=%llu | forks=[%d, %d]\n", table->philos[i]->id, table->philos[i]->n_meals, table->philos[i]->time_to_eat, table->philos[i]->time_to_sleep, table->philos[i]->fork[0], table->philos[i]->fork[1]);
+		if (table->philos[i]->gen_info != table->gen_info)
+			printf("Error address gen_info\n");
+		if (table->philos[i]->mutexes != table->mutexes)
+			printf("Error address mutexes\n");
 		i++;
 	}
+	printf("OBSERVER VALUES: n_philos=%d | n_min_meals=%d | time_to_die=%llu\n", table->observer->n_philos, table->observer->n_min_meals, table->observer->time_to_die);
+	if (table->observer->gen_info != table->gen_info)
+		printf("Error address gen_info\n");
+	if (table->observer->mutexes != table->mutexes)
+		printf("Error address mutexes\n");
+	printf("GEN_INFO VALUES: stop_sim=%d\n", table->gen_info->stop_sim);
 }
 
 /* init_simulation:
-*	Initialize/Create all the threads for the simulation.
-*	Return false in case of error and print error message and
-*	otherwise true.
+*	Initialize/Create all the threads for the simulation and 
+*	call pthread_join for each thread.
+*	Return false in case of error (includes triggering error-
+*	message) and
+*	true in case of success.
 */
 bool	init_simulation(t_table *table)
 {
-	unsigned int	i;
+	int	i;
 
 	set_start_time(table);
-	i = 0;
-	while (i < table->n_philos)
+	i = -1;
+	while (++i < table->n_philos)
 	{
 		if (pthread_create(&table->philos[i]->thread, NULL,
 				philosopher, table->philos[i]))
-			return (error_free(STR_ERR_THREAD, NULL, NULL, table), false);
-		i++;
+			return (exit_philo(i, table, STR_ERR_THREAD, NULL), false);
 	}
-	// ... create meal_obs (to observe the state of the tables and stop the simulation)
-	if (pthread_create(&table->thread_observer, NULL, observer, table))
-		return (error_free(STR_ERR_THREAD, NULL, NULL, table), false);
+	if (pthread_create(&table->observer->thread, NULL, observer, table))
+		return (exit_philo(table->n_philos, table, STR_ERR_THREAD, NULL), false);
 	i = -1;
 	while (++i < table->n_philos)
 		pthread_join(table->philos[i]->thread, NULL);
-	pthread_join(table->thread_observer, NULL);
-	exit_philo()
+	pthread_join(table->observer->thread, NULL);
 	return (true);
 }
 
+/* main:
+*	Calls all the functions and at the end terminates the
+*	program.
+*/
 int	main(int argc, char **argv)
 {
 	t_table	*table;
@@ -85,7 +97,6 @@ int	main(int argc, char **argv)
 	//print_table(table);
 	if (!init_simulation(table))
 		return (EXIT_FAILURE);
-	// stop simulation
-	exit_philo(table->n_philos, table);
+	exit_philo(table->n_philos, table, NULL, NULL);
 	return (EXIT_SUCCESS);
 }

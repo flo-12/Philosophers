@@ -10,17 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "../includes/philo.h"
 
 /* set_stop_sim:
 *	Sets the value whether the simulation should stop
-*	and locks the mutex that protects the value.
+*	Precondition: mutex_stop_sim is locked.
+*	No return.
 */
-void	set_stop_sim(t_table *table, bool state)
+void	set_stop_sim(t_gen_info *gen_info, bool state)
 {
-	pthread_mutex_lock(&table->mutex_stop_sim);
-	table->stop_sim = state;
-	pthread_mutex_unlock(&table->mutex_stop_sim);
+	gen_info->stop_sim = state;
 }
 
 /* get_stop_sim:
@@ -29,19 +28,94 @@ void	set_stop_sim(t_table *table, bool state)
 *	Returns the bool-value whether the simulation should
 *	stop.
 */
-bool	get_stop_sim(t_table *table)
+bool	get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim)
 {
 	bool	state;
 
 	state = false;
-	pthread_mutex_lock(&table->mutex_stop_sim);
-	if (table->stop_sim)
+	pthread_mutex_lock(mutex_stop_sim);
+	if (&stop_sim)
 		state = true;
-	pthread_mutex_unlock(&table->mutex_stop_sim);
+	pthread_mutex_unlock(mutex_stop_sim);
 	return (state);
 }
 
+/* min_meals_reached:
+*	Check if all philosophers had enough meals. If that's the
+*	case, print out the state message (if in debug-mode) and
+*	set the gen_info->sim_stop variable.
+*	Return true if all philosophers had enough meals and false
+*	if at least one philosophers didn't have n_min_meals.
+*/
+bool	min_meals_reached(t_observer *observer)
+{
+	int		i;
+
+	pthread_mutex_lock(&observer->mutexes->mutex_stop_sim);
+	i = -1;
+	while (++i < observer->n_philos)
+	{	
+		if (observer->gen_info->n_meals[i] < observer->n_min_meals)
+		{
+			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
+			return (false);
+		}
+	}
+	set_stop_sim(&observer->gen_info->stop_sim, true);
+	pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
+	if (DEBUG_MSG)
+		print_state(STR_STATE_MEA, observer->t_start, -1, &observer->mutexes->mutex_print);
+	return (true);
+}
+
+/* pihlo_starved:
+*	Check if one of the philosophers starved by comparing the
+*	current time, the time of the last meal and the time to
+*	die.
+*	Sets the gen_info->stop_sim to true if a philisopher died
+*	and triggers the state message.
+*	Return true if a philosopher died and false if all
+*	philosophers are still alive.
+*/
+bool	pihlo_starved(t_observer *observer)
+{
+	int	i;
+
+	pthread_mutex_lock(&observer->mutexes->mutex_stop_sim);
+	i = -1;
+	while (++i < observer->n_philos)
+	{
+		if (get_time_ms() > observer->gen_info->t_last_meal[i] + observer->time_to_die)
+		{
+			set_stop_sim(&observer->gen_info->stop_sim, true);
+			print_state(STR_STATE_DIE, observer->t_start, i + 1, &observer->mutexes->mutex_print);
+			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
+			return (true);
+		}
+	}
+	pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
+	return (false);
+}
+
+/* observer:
+*	Monitors the table / if the simulation should stop. The
+*	simulation should stop, if a philosopher died or if all
+*	philosophers ate enough.
+*	Sets the variable gen_info->stop_sim to true if the
+*	simulation should stop to indicate the philosophers to
+*	exit their functions.
+*/
 void	*observer(void *arg)
 {
-	
+	t_observer	*observer;
+
+	observer = (t_observer *)arg;
+	while (1)
+	{
+		if (min_meals_reached(observer))
+			break ;
+		if (pihlo_starved(observer))
+			break ;
+	}
+	return (NULL);
 }

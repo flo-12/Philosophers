@@ -28,6 +28,7 @@
 *                                     Macros                                  *
 ******************************************************************************/
 
+# define DEBUG_MSG 1
 # define MAX_PHILOS 300
 # define STR_MAX_PHILOS "300"
 # define STR_MAX_U_INT "4294967295"
@@ -40,7 +41,7 @@ not a valid unsigned integer between 0 and 4,294,967,295.\n"
 # define STR_ERR_INPUT_MAXPHILOS	"invalid input (%s): \
 too many Philosophers (max: %s).\n"
 # define STR_ERR_THREAD	"error: Could not create thread.\n"
-# define STR_ERR_THREAD_DET	"error: Could not detach thread.\n"
+# define STR_ERR_THREAD_DET	"error exiting philo.c: Could not detach thread.\n"
 # define STR_ERR_MALLOC	"error: Could not allocate memory.\n"
 # define STR_ERR_MUTEX	"error: Could not create mutex.\n"
 
@@ -52,6 +53,7 @@ too many Philosophers (max: %s).\n"
 # define STR_STATE_SLE "%llu %u is sleeping\n"
 # define STR_STATE_THI "%llu %u is thinking\n"
 # define STR_STATE_DIE "%llu %u died\n"
+# define STR_STATE_MEA "%llu all philosopher ate enough\n"
 
 /**************************************************************************
 *                               STRUCTURES                                *
@@ -84,10 +86,10 @@ typedef struct s_philo
 	unsigned int		id;
 	unsigned int		n_meals;		// [obs] detect -> stop_sim
 	unsigned long long	t_last_meal;	// [obs] detect starvation -> stop_sim
-	unsigned long long	t_start;
+	unsigned long long	t_start;		// not initialized
 	unsigned long long	time_to_eat;
 	unsigned long long	time_to_sleep;
-	pthread_mutex_t		fork[2];
+	int					fork[2];
 	t_gen_info			*gen_info;
 	t_mutex				*mutexes;
 }	t_philo;
@@ -97,8 +99,7 @@ typedef struct s_observer
 	pthread_t			thread;
 	int					n_philos;
 	int					n_min_meals;
-	unsigned long long	t_start;
-	//unsigned int		time_to_die;
+	unsigned long long	t_start;		// not initialized
 	unsigned long long	time_to_die;
 	t_mutex				*mutexes;
 	t_gen_info			*gen_info;
@@ -108,7 +109,7 @@ typedef struct s_table
 {
 	unsigned long long	t_start;
 	int					n_philos;
-	t_obs				*observer;
+	t_observer			*observer;
 	t_mutex				*mutexes;
 	t_philo				**philos;
 	t_gen_info			*gen_info;
@@ -122,22 +123,21 @@ typedef struct s_table
 bool				check_input(int argc, char **argv);
 
 // exit_philo.c
-//void				error_free(char *str, char *arg1, char *arg2, t_table *table);
 void				exit_philo(int n_detach, t_table *table, char *str, char *arg);
+void				free_mem(t_table *table);
 
 // init.c
 t_table				*init_table(int argc, char **argv);
 
 // output.c
-//void				msg(char *str, char *arg1, char *arg2);
-void				print_state(char *str, t_philo *philo);
+void				msg(char *str, char *arg1);
+void				print_state(char *str, unsigned long long t_start, int id, pthread_mutex_t *mutex_print);
 
 // philosopher.c
 void				*philosopher(void *arg);
 
 // observer.c
-void				set_stop_sim(t_table *table, bool state);
-bool				get_stop_sim(t_table *table);
+bool				get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim);
 void				*observer(void *arg);
 
 // time.c
@@ -146,5 +146,6 @@ void				set_start_time(t_table *table);
 
 // utils.c
 int					ft_strlen(char *str);
+unsigned int		atoi_uint(char *str);
 
 #endif

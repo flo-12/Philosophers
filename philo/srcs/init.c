@@ -10,102 +10,108 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
-/* assign_forks:
-*	Assigns the index of two forks to the Philosopher. The index refers to
-*	the forks the Philosopher picks up to eat - and their order.
-*	Even-numbered Philosophers first pick up the left fork and then the
-*	right fork and uneven-numbered Philosophers vice-versa.
-*	This order is important to not get a deadlock in case that all Philosophers
-*	want to eat at the same time, pick up first the left fork and can't pick
-*	up the right fork because it's taken by the Philosopher to their right.
-*	This method guarantees abn asynchronic lock of the forks and avoids
-*	deadlocks.
-*/
-void	assign_forks(t_philo *philo, unsigned int n_philos)
-{
-	if (philo->id % 2 == 0)
-	{
-		philo->fork[0] = philo->id;
-		philo->fork[1] = (philo->id + 1) % n_philos;
-	}
-	else
-	{
-		philo->fork[0] = (philo->id + 1) % n_philos;;
-		philo->fork[1] = philo->id;
-	}	
-}
+#include "../includes/philo.h"
 
 /* init_philos:
-*	Allocates the memory for each Philosopher and initializes
-*	their values (as far as known).
-*	Returns a pointer to the array of pointers to the t_philo
-*	for each Philosopher or NULL in case of failure.
+*	Allocates the memory for each Philosopher and initializes their
+*	values (as far as known).
+*	Return false in case of error (includes triggering error-message) and
+*	true in case of success.
 */
-t_philo	**init_philos(t_table *table)
+bool	init_philos(t_table *table, char **argv)
 {
-	t_philo			**philos;
-	unsigned int	i;
+	int	i;
 
-	philos = malloc(sizeof(t_philo *) * table->n_philos);
-	if (!philos)
-		return (error_free(STR_ERR_MALLOC, NULL, NULL, table), NULL);
 	i = 0;
 	while (i < table->n_philos)
 	{
-		philos[i] = malloc(sizeof(t_philo));
-		if (!philos[i])
-			return (error_free(STR_ERR_MALLOC, NULL, NULL, table), NULL);
-		philos[i]->id = i;
-		philos[i]->n_meals = 0;
-		philos[i]->table = table;
-		assign_forks(philos[i], table->n_philos);
+		table->philos[i] = malloc(sizeof(t_philo));
+		if (!table->philos[i])
+			return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
+		table->philos[i]->id = i;
+		table->philos[i]->n_meals = 0;
+		table->philos[i]->time_to_eat = (unsigned long long)atoi_uint(argv[3]);
+		table->philos[i]->time_to_sleep = (unsigned long long)atoi_uint(argv[4]);
+		table->philos[i]->gen_info = table->gen_info;
+		table->philos[i]->mutexes = table->mutexes;
+		if (table->philos[i]->id % 2 == 0)
+		{
+			table->philos[i]->fork[0] = table->philos[i]->id;
+			table->philos[i]->fork[1] = (table->philos[i]->id + 1) % table->n_philos;
+		}
+		else
+		{
+			table->philos[i]->fork[0] = (table->philos[i]->id + 1) % table->n_philos;
+			table->philos[i]->fork[1] = table->philos[i]->id;
+		}
 		i++;
 	}
-	return (philos);
+	return (true);
 }
 
-/* atoi_uint:
-*	Converts a string into an unsigned int.
-*	Return the unsigned int.
-*	Precondition: str is in the range of an unsigned int
-*		and only consists digits.
+/* init_mutexes:
+*	Allocates memory and initializes the Mutexes of the struct t_mutex.
+*	Return false in case of error (includes triggering error-message) and
+*	true in case of success.
 */
-unsigned int	atoi_uint(char *str)
+bool	init_mutexes(t_table *table)
 {
-	int				i;
-	unsigned int	nbr;
+	int		i;
 
-	nbr = 0;
-	i = -1;
-	while (str[++i])
-		nbr = nbr * 10 + (str[i] - '0');
-	return (nbr);
-}
-
-/* init_mutex_table:
-*	Allocates memory and initializes the Mutexes of the struct t_table.
-*	Return false in case of error and true in case of success.
-*/
-bool	init_mutex_table(t_table *table)
-{
-	unsigned int		i;
-
-	table->forks = malloc(sizeof(pthread_mutex_t) * table->n_philos);
-	if (!table->forks)
-		return (false);
+	table->mutexes->forks = malloc(sizeof(pthread_mutex_t) * table->n_philos);
+	if (!table->mutexes->forks)
+		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
 	i = 0;
 	while (i < table->n_philos)
 	{
-		if (pthread_mutex_init(&table->forks[i], 0))
-			return (false);
+		if (pthread_mutex_init(&table->mutexes->forks[i], 0))
+			return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
 		i++;
 	}
-	if (pthread_mutex_init(&table->mutex_stop_sim, 0))
-		return (false);
-	if (pthread_mutex_init(&table->mutex_time, 0))
-		return (false);
+	if (pthread_mutex_init(&table->mutexes->mutex_stop_sim, 0))
+		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
+	if (pthread_mutex_init(&table->mutexes->mutex_time, 0))
+		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
+	if (pthread_mutex_init(&table->mutexes->mutex_print, 0))
+		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
+	return (true);
+}
+
+/* init_gen_info:
+*	Initialize the data in t_gen_info and allocate the needed memory.
+*	Return false in case of error (includes triggering error-message) and
+*	true in case of success.
+*/
+bool	init_gen_info(t_table *table)
+{
+	table->gen_info->n_meals = malloc(sizeof(unsigned int) * table->n_philos);
+	table->gen_info->t_last_meal = malloc(sizeof(unsigned long long) * table->n_philos);
+	if (!table->gen_info->n_meals || !table->gen_info->t_last_meal)
+		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
+	table->gen_info->stop_sim = false;
+	return (true);
+}
+
+/* init_observer:
+*	Initializes all the values (except for t_start -> see init_simulation)
+*	of the struct t_observer.
+*	Return false in case of error (includes triggering error-message) and
+*	true in case of success.
+*/
+bool	init_observer(t_table *table, int argc, char **argv)
+{
+	table->observer->n_philos = table->n_philos;
+	if (argc == 6)
+	{
+		table->observer->n_min_meals = (int)atoi_uint(argv[5]);
+		if (table->observer->n_min_meals == 0)
+			return (exit_philo(-1, table, STR_SUC_0MEAL, NULL), false);
+	}
+	else
+		table->observer->n_min_meals = -1;
+	table->observer->time_to_die = (unsigned long long)atoi_uint(argv[2]);
+	table->observer->mutexes = table->mutexes;
+	table->observer->gen_info = table->gen_info;
 	return (true);
 }
 
@@ -115,32 +121,28 @@ bool	init_mutex_table(t_table *table)
 *	variables.
 *	Returns a pointer to the table structure or NULL in case
 *	an error occured.
-*
 */
 t_table	*init_table(int argc, char **argv)
 {
 	t_table	*table;
 
-	table = malloc(sizeof(t_table) * 1);
+	table = malloc(sizeof(t_table));
 	if (!table)
 		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), NULL);
 	table->n_philos = (int)atoi_uint(argv[1]);
-	table->time_to_die = atoi_uint(argv[2]);
-	table->time_to_eat = atoi_uint(argv[3]);
-	table->time_to_sleep = atoi_uint(argv[4]);
-	if (argc == 6)
-	{
-		table->n_min_meals = atoi_uint(argv[5]);
-		if (table->n_min_meals == 0)
-			return (error_free(STR_SUC_0MEAL, NULL, NULL), NULL);
-	}
-	else
-		table->n_min_meals = 0;
-	if (!init_mutex_table(table))
-		return (error_free(STR_ERR_MUTEX, NULL, NULL, table), NULL);
-	table->philos = init_philos(table);
-	if (!table->philos)
+	table->observer = malloc(sizeof(t_observer) * 1);
+	table->mutexes = malloc(sizeof(t_mutex) * 1);
+	table->philos = malloc(sizeof(t_philo *) * table->n_philos);
+	table->gen_info = malloc(sizeof(t_gen_info) * 1);
+	if (!table->observer || !table->mutexes || !table->philos || !table->gen_info)
+		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), NULL);
+	if (!init_gen_info(table))
 		return (NULL);
-	table->died = false;
+	if (!init_mutexes(table))
+		return (NULL);
+	if (!init_observer(table, argc, argv))
+		return (NULL);
+	if (!init_philos(table, argv))
+		return (NULL);
 	return (table);
 }

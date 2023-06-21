@@ -10,21 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
-
-/* error_null:
-*	Frees the data of table and prints out the message in str.
-*/
-/*void	error_free(char *str, char *arg1, char *arg2, t_table *table)
-{
-	if (table != NULL)
-		free_table(table);
-	msg(str, arg1, arg2);
-}*/
+#include "../includes/philo.h"
 
 /* free_mem:
-*	Frees all the allocated memory in t_table and t_philo
-*	if it exists.
+*	Frees all the allocated memory in the structs.
 */
 void	free_mem(t_table *table)
 {
@@ -39,25 +28,38 @@ void	free_mem(t_table *table)
 			free(table->philos[i]);
 		free(table->philos);
 	}
-	if (table->forks)
-		free(table->forks);
+	if (table->observer)
+		free(table->observer);
+	if (table->mutexes)
+	{
+		if (table->mutexes->forks)
+			free(table->mutexes->forks);
+		free(table->mutexes);
+	}
+	if (table->gen_info)
+	{
+		if (table->gen_info->n_meals)
+			free(table->gen_info->n_meals);
+		if (table->gen_info->t_last_meal)
+			free(table->gen_info->t_last_meal);
+		free(table->gen_info);
+	}
 	free(table);
 }
 
 /* destroy_mutex:
 *	Destroys all the mutexes in table.
 */
-void	destroy_mutex(t_table *table)
+void	destroy_mutex(t_mutex *mutexes, int n_philos)
 {
 	int	i;
 
-	pthread_mutex_destroy(&table->mutex_stop_sim);
-	pthread_mutex_destroy(&table->mutex_time);
-	pthread_mutex_destroy(&table->mutex_print);
-	pthread_mutex_destroy(&table->forks)
+	pthread_mutex_destroy(&mutexes->mutex_stop_sim);
+	pthread_mutex_destroy(&mutexes->mutex_time);
+	pthread_mutex_destroy(&mutexes->mutex_print);
 	i = -1;
-	while (++i < table->n_philos)
-		pthread_mutex_destroy(&table->forks[i]);
+	while (++i < n_philos)
+		pthread_mutex_destroy(&mutexes->forks[i]);
 }
 
 /* detach_thread:
@@ -74,11 +76,10 @@ void	detach_thread(int n_detach, t_table *table)
 	bool	error;
 
 	error = false;
-	if (n_detach == -1)
+	if (n_detach == table->n_philos)
 	{
-		if (pthread_detach(table->observer))
+		if (pthread_detach(table->observer->thread))
 			error = true;
-		n_detach = table->n_philos;
 	}
 	else if (n_detach >= 0 && n_detach < table->n_philos)
 		n_detach++;
@@ -91,7 +92,7 @@ void	detach_thread(int n_detach, t_table *table)
 			error = true;
 	}
 	if (error)
-		// print STR_ERR_THREAD_DET
+		msg(STR_ERR_THREAD_DET, NULL);
 }
 
 /* exit_philo:
@@ -111,7 +112,8 @@ void	detach_thread(int n_detach, t_table *table)
 */
 void	exit_philo(int n_detach, t_table *table, char *str, char *arg)
 {
-	destroy_mutex(table);
+	destroy_mutex(table->mutexes, table->n_philos);
 	detach_thread(n_detach, table);
 	free_mem(table);
+	msg(str, arg);
 }
