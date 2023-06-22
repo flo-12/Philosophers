@@ -32,12 +32,14 @@
 # define MAX_PHILOS 300
 # define STR_MAX_PHILOS "300"
 # define STR_MAX_U_INT "4294967295"
+# define STR_MAX_INT "2147483647"
 
 # define STR_ERR_USAGE	"usage: ./philo <number_of_philosophers> \
 <time_to_die> <time_to_eat> <time_to_sleep> \
 [number_of_times_each_philosopher_must_eat]\n"
 # define STR_ERR_INPUT_DIGIT	"invalid input (%s): \
-not a valid unsigned integer between 0 and 4,294,967,295.\n"
+not a valid number - either out of range or contains \
+non-numeric characters.\n"
 # define STR_ERR_INPUT_MAXPHILOS	"invalid input (%s): \
 too many Philosophers (max: %s).\n"
 # define STR_ERR_THREAD	"error: Could not create thread.\n"
@@ -141,7 +143,7 @@ bool				get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim);
 void				*observer(void *arg);
 
 // time.c
-unsigned long long	get_time(void);
+unsigned long long	get_time_ms(void);
 void				set_start_time(t_table *table);
 
 // utils.c

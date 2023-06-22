@@ -24,9 +24,9 @@ void	philo_wait(unsigned long long time_to_sleep, t_philo *philo)
 	wake_up = get_time_ms() + time_to_sleep;
 	while (get_time_ms() < wake_up)
 	{
-		if (get_stop_sim(philo->gen_info->stop_sim, &philo->mutexes->mutex_stop_sim))
+		if (get_stop_sim(&philo->gen_info->stop_sim, &philo->mutexes->mutex_stop_sim))
 			break ;
-		uslepp(1000);
+		usleep(1000);
 	}
 }
 
@@ -92,7 +92,8 @@ void	*philosopher(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2 == 1)
 		sleep_routine(philo);
-	while (get_stop_sim(philo->gen_info->stop_sim, &philo->mutexes->mutex_stop_sim))
+	while (1)
+	//while (get_stop_sim(&philo->gen_info->stop_sim, &philo->mutexes->mutex_stop_sim))
 	{
 		eat_routine(philo);
 		sleep_routine(philo);

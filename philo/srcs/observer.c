@@ -17,9 +17,9 @@
 *	Precondition: mutex_stop_sim is locked.
 *	No return.
 */
-void	set_stop_sim(t_gen_info *gen_info, bool state)
+void	set_stop_sim(bool *stop_sim, bool state)
 {
-	gen_info->stop_sim = state;
+	*stop_sim = state;
 }
 
 /* get_stop_sim:
@@ -34,7 +34,7 @@ bool	get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim)
 
 	state = false;
 	pthread_mutex_lock(mutex_stop_sim);
-	if (&stop_sim)
+	if (*stop_sim)
 		state = true;
 	pthread_mutex_unlock(mutex_stop_sim);
 	return (state);
@@ -51,11 +51,14 @@ bool	min_meals_reached(t_observer *observer)
 {
 	int		i;
 
+	if (observer->n_min_meals == -1)
+		return (false);
 	pthread_mutex_lock(&observer->mutexes->mutex_stop_sim);
 	i = -1;
 	while (++i < observer->n_philos)
-	{	
-		if (observer->gen_info->n_meals[i] < observer->n_min_meals)
+	{
+		printf("philo %d with %u meals\n", i+1, observer->gen_info->n_meals[i]);
+		if (observer->gen_info->n_meals[i] < (unsigned int)observer->n_min_meals)
 		{
 			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 			return (false);
