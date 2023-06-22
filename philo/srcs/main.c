@@ -12,19 +12,6 @@
 
 #include "../includes/philo.h"
 
-/*
-CHECK AGAIN:
-	* in while loop in philosopher-fct: break if stop_sim is true
-	* check mutexes in structs and think about which ones are necessary
-		* mutex for time calculations in print_state
-		* mutex to write state messages (avoid mixing up state messages)
-		* necessary:
-			- mutex_write_output (to print each state message)
-			- mutex_forks (to lock each fork)
-			- mutex_eat_enough (in table for each philo to mark if it ate enough)
-			- mutex_n_eat (for the table_obs to check if a philo died of starvation)
-	* break the eat/think/sleep routine if a philo dies of starvation
-*/
 
 void	print_table(t_table *table)
 {
@@ -71,7 +58,7 @@ bool	init_simulation(t_table *table)
 				philosopher, table->philos[i]))
 			return (exit_philo(i, table, STR_ERR_THREAD, NULL), false);
 	}
-	if (pthread_create(&table->observer->thread, NULL, observer, table))
+	if (pthread_create(&table->observer->thread, NULL, observer, table->observer))
 		return (exit_philo(table->n_philos, table, STR_ERR_THREAD, NULL), false);
 	i = -1;
 	while (++i < table->n_philos)
@@ -97,6 +84,7 @@ int	main(int argc, char **argv)
 	//print_table(table);
 	if (!init_simulation(table))
 		return (EXIT_FAILURE);
-	exit_philo(table->n_philos, table, NULL, NULL);
+	//exit_philo(table->n_philos, table, NULL, NULL);
+	exit_philo(-1, table, NULL, NULL);
 	return (EXIT_SUCCESS);
 }

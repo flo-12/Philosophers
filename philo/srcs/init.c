@@ -88,6 +88,8 @@ bool	init_gen_info(t_table *table)
 	table->gen_info->t_last_meal = malloc(sizeof(unsigned long long) * table->n_philos);
 	if (!table->gen_info->n_meals || !table->gen_info->t_last_meal)
 		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
+	memset(table->gen_info->n_meals, 0, sizeof(unsigned int) * table->n_philos);
+	memset(table->gen_info->t_last_meal, 0, sizeof(unsigned long long) * table->n_philos);
 	table->gen_info->stop_sim = false;
 	return (true);
 }

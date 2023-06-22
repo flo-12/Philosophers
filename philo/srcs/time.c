@@ -37,6 +37,7 @@ void	set_start_time(t_table *table)
 	while (++i < table->n_philos)
 	{
 		table->philos[i]->t_start = table->t_start;
-		table->philos[i]->t_last_meal = table->t_start;
+		//table->philos[i]->t_last_meal = table->t_start;
+		table->gen_info->t_last_meal[i] = table->t_start;
 	}
 }

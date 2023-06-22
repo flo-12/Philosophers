@@ -17,12 +17,13 @@
 *                               HEADERS                                   *
 **************************************************************************/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <pthread.h>
+# include <string.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <sys/time.h>
+# include <pthread.h>
+# include <stdbool.h>
 
 /******************************************************************************
 *                                     Macros                                  *
@@ -60,12 +61,6 @@ too many Philosophers (max: %s).\n"
 /**************************************************************************
 *                               STRUCTURES                                *
 **************************************************************************/
-
-typedef enum e_bool
-{
-	false = 0,
-	true = 1
-}	bool;
 
 typedef struct gen_info
 {
@@ -125,7 +120,8 @@ typedef struct s_table
 bool				check_input(int argc, char **argv);
 
 // exit_philo.c
-void				exit_philo(int n_detach, t_table *table, char *str, char *arg);
+void				exit_philo(int n_detach, t_table *table, 
+						char *str, char *arg);
 void				free_mem(t_table *table);
 
 // init.c
@@ -133,13 +129,15 @@ t_table				*init_table(int argc, char **argv);
 
 // output.c
 void				msg(char *str, char *arg1);
-void				print_state(char *str, unsigned long long t_start, int id, pthread_mutex_t *mutex_print);
+void				print_state(char *str, unsigned long long t_start, 
+						int id, pthread_mutex_t *mutex_print);
 
 // philosopher.c
 void				*philosopher(void *arg);
 
 // observer.c
-bool				get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim);
+bool				get_stop_sim(bool *stop_sim, 
+						pthread_mutex_t *mutex_stop_sim);
 void				*observer(void *arg);
 
 // time.c

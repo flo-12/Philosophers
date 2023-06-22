@@ -24,7 +24,7 @@ void	free_mem(t_table *table)
 	if (table->philos)
 	{
 		i = -1;
-		while (table->philos[++i])
+		while (++i < table->n_philos)
 			free(table->philos[i]);
 		free(table->philos);
 	}
@@ -74,7 +74,7 @@ void	detach_thread(int n_detach, t_table *table)
 {
 	int		i;
 	bool	error;
-
+	
 	error = false;
 	if (n_detach == table->n_philos)
 	{
