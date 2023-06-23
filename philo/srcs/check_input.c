@@ -69,7 +69,8 @@ bool	check_input(int argc, char **argv)
 		if (!contains_only_digits(argv[i]))
 			return (printf(STR_ERR_INPUT_DIGIT, argv[i]), false);
 		if (i == 1 && !in_positive_range(argv[i], STR_MAX_PHILOS))
-			return (printf(STR_ERR_INPUT_MAXPHILOS, argv[i], STR_MAX_PHILOS), false);
+			return (printf(STR_ERR_INPUT_MAXPHILOS, argv[i], STR_MAX_PHILOS),
+				false);
 		else if (i < 6 && !in_positive_range(argv[i], STR_MAX_U_INT))
 			return (printf(STR_ERR_INPUT_DIGIT, argv[i]), false);
 		else if (i == 6 && !in_positive_range(argv[i], STR_MAX_INT))

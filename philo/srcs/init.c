@@ -12,6 +12,36 @@
 
 #include "../includes/philo.h"
 
+/* init_forks:
+*	Initializes the index of the fork the philosopher graps. It
+*	first graps the fork[0] and afterwards the fork[1]. This way
+*	it's an asynchronous call of the forks and avoids deadlocks.
+*	For example:
+*		philo 0:
+*			fork[0]= 0 (<left_fork>)
+*			fork[1]= 1 (<right_fork>)
+*		philo 1:
+*			fork[0]= 1 (<right_fork>)
+*			fork[1]= 0 (<left_fork>)
+*/
+void	init_forks(t_table *table, int i)
+{
+	if (table->philos[i]->id % 2 == 0)
+	{
+		table->philos[i]->fork[0]
+			= table->philos[i]->id;
+		table->philos[i]->fork[1]
+			= (table->philos[i]->id + 1) % table->n_philos;
+	}
+	else
+	{
+		table->philos[i]->fork[0]
+			= (table->philos[i]->id + 1) % table->n_philos;
+		table->philos[i]->fork[1]
+			= table->philos[i]->id;
+	}
+}
+
 /* init_philos:
 *	Allocates the memory for each Philosopher and initializes their
 *	values (as far as known).
@@ -29,21 +59,14 @@ bool	init_philos(t_table *table, char **argv)
 		if (!table->philos[i])
 			return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
 		table->philos[i]->id = i;
+		table->philos[i]->n_philos = table->n_philos;
 		table->philos[i]->n_meals = 0;
 		table->philos[i]->time_to_eat = (unsigned long long)atoi_uint(argv[3]);
-		table->philos[i]->time_to_sleep = (unsigned long long)atoi_uint(argv[4]);
+		table->philos[i]->time_to_sleep
+			= (unsigned long long)atoi_uint(argv[4]);
 		table->philos[i]->gen_info = table->gen_info;
 		table->philos[i]->mutexes = table->mutexes;
-		if (table->philos[i]->id % 2 == 0)
-		{
-			table->philos[i]->fork[0] = table->philos[i]->id;
-			table->philos[i]->fork[1] = (table->philos[i]->id + 1) % table->n_philos;
-		}
-		else
-		{
-			table->philos[i]->fork[0] = (table->philos[i]->id + 1) % table->n_philos;
-			table->philos[i]->fork[1] = table->philos[i]->id;
-		}
+		init_forks(table, i);
 		i++;
 	}
 	return (true);
@@ -85,11 +108,14 @@ bool	init_mutexes(t_table *table)
 bool	init_gen_info(t_table *table)
 {
 	table->gen_info->n_meals = malloc(sizeof(unsigned int) * table->n_philos);
-	table->gen_info->t_last_meal = malloc(sizeof(unsigned long long) * table->n_philos);
+	table->gen_info->t_last_meal = malloc(sizeof(unsigned long long)
+			* table->n_philos);
 	if (!table->gen_info->n_meals || !table->gen_info->t_last_meal)
 		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
-	memset(table->gen_info->n_meals, 0, sizeof(unsigned int) * table->n_philos);
-	memset(table->gen_info->t_last_meal, 0, sizeof(unsigned long long) * table->n_philos);
+	memset(table->gen_info->n_meals, 0,
+		sizeof(unsigned int) * table->n_philos);
+	memset(table->gen_info->t_last_meal, 0,
+		sizeof(unsigned long long) * table->n_philos);
 	table->gen_info->stop_sim = false;
 	return (true);
 }
@@ -115,36 +141,4 @@ bool	init_observer(t_table *table, int argc, char **argv)
 	table->observer->mutexes = table->mutexes;
 	table->observer->gen_info = table->gen_info;
 	return (true);
-}
-
-/* init_table:
-*	Initialize the table struct with the user input containing
-*	the program's parameters and initializing the other
-*	variables.
-*	Returns a pointer to the table structure or NULL in case
-*	an error occured.
-*/
-t_table	*init_table(int argc, char **argv)
-{
-	t_table	*table;
-
-	table = malloc(sizeof(t_table));
-	if (!table)
-		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), NULL);
-	table->n_philos = (int)atoi_uint(argv[1]);
-	table->observer = malloc(sizeof(t_observer) * 1);
-	table->mutexes = malloc(sizeof(t_mutex) * 1);
-	table->philos = malloc(sizeof(t_philo *) * table->n_philos);
-	table->gen_info = malloc(sizeof(t_gen_info) * 1);
-	if (!table->observer || !table->mutexes || !table->philos || !table->gen_info)
-		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), NULL);
-	if (!init_gen_info(table))
-		return (NULL);
-	if (!init_mutexes(table))
-		return (NULL);
-	if (!init_observer(table, argc, argv))
-		return (NULL);
-	if (!init_philos(table, argv))
-		return (NULL);
-	return (table);
 }

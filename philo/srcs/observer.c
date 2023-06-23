@@ -57,7 +57,8 @@ bool	min_meals_reached(t_observer *observer)
 	i = -1;
 	while (++i < observer->n_philos)
 	{
-		if (observer->gen_info->n_meals[i] < (unsigned int)observer->n_min_meals)
+		if (observer->gen_info->n_meals[i]
+			< (unsigned int)observer->n_min_meals)
 		{
 			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 			return (false);
@@ -66,7 +67,8 @@ bool	min_meals_reached(t_observer *observer)
 	set_stop_sim(&observer->gen_info->stop_sim, true);
 	pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 	if (DEBUG_MSG)
-		print_state(STR_STATE_MEA, observer->t_start, -1, &observer->mutexes->mutex_print);
+		print_state(STR_STATE_MEA, observer->t_start, -1,
+			&observer->mutexes->mutex_print);
 	return (true);
 }
 
@@ -87,10 +89,12 @@ bool	pihlo_starved(t_observer *observer)
 	i = -1;
 	while (++i < observer->n_philos)
 	{
-		if (!(get_time_ms() - observer->gen_info->t_last_meal[i] < observer->time_to_die))
+		if (!(get_time_ms() - observer->gen_info->t_last_meal[i]
+				< observer->time_to_die))
 		{
 			set_stop_sim(&observer->gen_info->stop_sim, true);
-			print_state(STR_STATE_DIE, observer->t_start, i + 1, &observer->mutexes->mutex_print);
+			print_state(STR_STATE_DIE, observer->t_start, i + 1,
+				&observer->mutexes->mutex_print);
 			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 			return (true);
 		}

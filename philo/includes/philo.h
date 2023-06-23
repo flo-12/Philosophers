@@ -66,14 +66,14 @@ typedef struct gen_info
 {
 	unsigned int		*n_meals;
 	unsigned long long	*t_last_meal;
-	bool				stop_sim;		// if philo is dead or all philos had enough meals
+	bool				stop_sim;
 }	t_gen_info;
 
 typedef struct s_mutex
 {
-	pthread_mutex_t		mutex_stop_sim;		// for stop_sim
-	pthread_mutex_t		mutex_time;			// for t_start and t_last_meal
-	pthread_mutex_t		mutex_print;		// to print state message (printf)
+	pthread_mutex_t		mutex_stop_sim;
+	pthread_mutex_t		mutex_time;
+	pthread_mutex_t		mutex_print;
 	pthread_mutex_t		*forks;
 }	t_mutex;
 
@@ -81,9 +81,10 @@ typedef struct s_philo
 {
 	pthread_t			thread;
 	unsigned int		id;
-	unsigned int		n_meals;		// [obs] detect -> stop_sim
-	unsigned long long	t_last_meal;	// [obs] detect starvation -> stop_sim
-	unsigned long long	t_start;		// not initialized
+	int					n_philos;
+	unsigned int		n_meals;
+	unsigned long long	t_last_meal;
+	unsigned long long	t_start;
 	unsigned long long	time_to_eat;
 	unsigned long long	time_to_sleep;
 	int					fork[2];
@@ -96,7 +97,7 @@ typedef struct s_observer
 	pthread_t			thread;
 	int					n_philos;
 	int					n_min_meals;
-	unsigned long long	t_start;		// not initialized
+	unsigned long long	t_start;
 	unsigned long long	time_to_die;
 	t_mutex				*mutexes;
 	t_gen_info			*gen_info;
@@ -125,7 +126,10 @@ void				exit_philo(int n_detach, t_table *table,
 void				free_mem(t_table *table);
 
 // init.c
-t_table				*init_table(int argc, char **argv);
+bool				init_observer(t_table *table, int argc, char **argv);
+bool				init_gen_info(t_table *table);
+bool				init_mutexes(t_table *table);
+bool				init_philos(t_table *table, char **argv);
 
 // output.c
 void				msg(char *str, char *arg1);
@@ -143,6 +147,8 @@ void				*observer(void *arg);
 // time.c
 unsigned long long	get_time_ms(void);
 void				set_start_time(t_table *table);
+void				philo_wait(unsigned long long time_to_sleep,
+						t_philo *philo);
 
 // utils.c
 int					ft_strlen(char *str);

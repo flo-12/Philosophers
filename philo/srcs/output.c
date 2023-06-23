@@ -30,7 +30,8 @@ void	msg(char *str, char *arg1)
 *	Only prints out the state if the simulation shouldn't be
 *	stopped.
 */
-void	print_state(char *str, unsigned long long t_start, int id, pthread_mutex_t *mutex_print)
+void	print_state(char *str, unsigned long long t_start,
+	int id, pthread_mutex_t *mutex_print)
 {
 	if (id >= 0)
 	{

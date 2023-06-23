@@ -21,29 +21,23 @@ void	free_mem(t_table *table)
 
 	if (!table)
 		return ;
+	i = -1;
+	while (table->philos && ++i < table->n_philos)
+		free(table->philos[i]);
 	if (table->philos)
-	{
-		i = -1;
-		while (++i < table->n_philos)
-			free(table->philos[i]);
 		free(table->philos);
-	}
 	if (table->observer)
 		free(table->observer);
+	if (table->mutexes && table->mutexes->forks)
+		free(table->mutexes->forks);
 	if (table->mutexes)
-	{
-		if (table->mutexes->forks)
-			free(table->mutexes->forks);
 		free(table->mutexes);
-	}
+	if (table->gen_info && table->gen_info->n_meals)
+		free(table->gen_info->n_meals);
+	if (table->gen_info && table->gen_info->t_last_meal)
+		free(table->gen_info->t_last_meal);
 	if (table->gen_info)
-	{
-		if (table->gen_info->n_meals)
-			free(table->gen_info->n_meals);
-		if (table->gen_info->t_last_meal)
-			free(table->gen_info->t_last_meal);
 		free(table->gen_info);
-	}
 	free(table);
 }
 
@@ -74,7 +68,7 @@ void	detach_thread(int n_detach, t_table *table)
 {
 	int		i;
 	bool	error;
-	
+
 	error = false;
 	if (n_detach == table->n_philos)
 	{
