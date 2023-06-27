@@ -30,6 +30,7 @@
 ******************************************************************************/
 
 # define DEBUG_MSG 1
+# define START_DELAY 100
 # define MAX_PHILOS 300
 # define STR_MAX_PHILOS "300"
 # define STR_MAX_U_INT "4294967295"
@@ -147,6 +148,7 @@ void				*observer(void *arg);
 
 // time.c
 unsigned long long	get_time_ms(void);
+void				time_sync(unsigned long long start_time);
 void				set_start_time(t_table *table);
 void				philo_wait(unsigned long long time_to_sleep,
 						t_philo *philo);

@@ -116,6 +116,7 @@ void	*observer(void *arg)
 	t_observer	*observer;
 
 	observer = (t_observer *)arg;
+	time_sync(observer->t_start);
 	while (1)
 	{
 		if (min_meals_reached(observer))

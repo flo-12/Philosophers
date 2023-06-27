@@ -23,6 +23,16 @@ unsigned long long	get_time_ms(void)
 	return ((unsigned long long)(t.tv_sec * 1000 + t.tv_usec / 1000));
 }
 
+/* time_sync:
+*	Syncronize the start times of all philosophers and
+*	the observer.
+*/
+void	time_sync(unsigned long long start_time)
+{
+	while (get_time_ms() < start_time)
+		continue ;
+}
+
 /* set_start_time:
 *	Initializes the start time (t_start) in each struct
 *	with the current time in ms.
@@ -31,12 +41,13 @@ void	set_start_time(t_table *table)
 {
 	int	i;
 
-	table->t_start = get_time_ms();
+	table->t_start = get_time_ms() + START_DELAY;
 	table->observer->t_start = table->t_start;
 	i = -1;
 	while (++i < table->n_philos)
 	{
 		table->philos[i]->t_start = table->t_start;
+		table->philos[i]->t_last_meal = table->t_start;
 		table->gen_info->t_last_meal[i] = table->t_start;
 	}
 }
