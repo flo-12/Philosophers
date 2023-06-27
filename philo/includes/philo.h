@@ -87,6 +87,7 @@ typedef struct s_philo
 	unsigned long long	t_start;
 	unsigned long long	time_to_eat;
 	unsigned long long	time_to_sleep;
+	unsigned long long	time_to_die;
 	int					fork[2];
 	t_gen_info			*gen_info;
 	t_mutex				*mutexes;

@@ -93,7 +93,9 @@ void	detach_thread(int n_detach, t_table *table)
 *	Free the allocated memory in the table & philo structs.
 *
 *	Detaches the threads in t_philos and the observer - 
-*	concerning the n_detach variable.
+*	concerning the n_detach variable. After pthread_join, the
+*	threads shouldn't be detached anymore, because pthread_join
+*	already detaches the threads.
 *
 *	Destroys all the mutexes (no additional check whether it's
 *	initialized or locked needed).

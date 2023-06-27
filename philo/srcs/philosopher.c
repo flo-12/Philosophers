@@ -78,15 +78,11 @@ void	think_routine(t_philo *philo)
 void	single_philo_routine(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->mutexes->forks[philo->fork[0]]);
-	if (!get_stop_sim(&philo->gen_info->stop_sim,
-			&philo->mutexes->mutex_stop_sim))
-		print_state(STR_STATE_FOR, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
+	print_state(STR_STATE_FOR, philo->t_start, philo->id + 1,
+		&philo->mutexes->mutex_print);
+	philo_wait(philo->time_to_die, philo);
 	print_state(STR_STATE_DIE, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
-	//while (!get_stop_sim(&philo->gen_info->stop_sim,
-	//		&philo->mutexes->mutex_stop_sim))
-		philo_wait(10000, philo);
+		&philo->mutexes->mutex_print);
 	pthread_mutex_unlock(&philo->mutexes->forks[philo->fork[0]]);
 }
 

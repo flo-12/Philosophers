@@ -64,6 +64,7 @@ bool	init_philos(t_table *table, char **argv)
 		table->philos[i]->time_to_eat = (unsigned long long)atoi_uint(argv[3]);
 		table->philos[i]->time_to_sleep
 			= (unsigned long long)atoi_uint(argv[4]);
+		table->philos[i]->time_to_die = table->observer->time_to_die;
 		table->philos[i]->gen_info = table->gen_info;
 		table->philos[i]->mutexes = table->mutexes;
 		init_forks(table, i);
