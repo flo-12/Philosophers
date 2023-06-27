@@ -71,8 +71,13 @@ void	think_routine(t_philo *philo)
 			&philo->mutexes->mutex_stop_sim))
 		print_state(STR_STATE_THI, philo->t_start, philo->id + 1,
 			&philo->mutexes->mutex_print);
-	t_think = (philo->time_to_die - (get_time_ms() - philo->t_last_meal)
-			- philo->time_to_eat) / 2;
+	t_think = (philo->time_to_die - (get_time_ms() - philo->t_last_meal)) / 2;
+	if (t_think < 100)
+		t_think = 0;
+	else if (t_think < 200)
+		t_think = 100;
+	else
+		t_think = 200;
 	philo_wait(t_think, philo);
 }
 
