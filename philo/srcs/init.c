@@ -85,10 +85,16 @@ bool	init_mutexes(t_table *table)
 	table->mutexes->forks = malloc(sizeof(pthread_mutex_t) * table->n_philos);
 	if (!table->mutexes->forks)
 		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
+	table->mutexes->mutex_meals = malloc(sizeof(pthread_mutex_t)
+			* table->n_philos);
+	if (!table->mutexes->mutex_meals)
+		return (exit_philo(-1, table, STR_ERR_MALLOC, NULL), false);
 	i = 0;
 	while (i < table->n_philos)
 	{
 		if (pthread_mutex_init(&table->mutexes->forks[i], 0))
+			return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
+		if (pthread_mutex_init(&table->mutexes->mutex_meals[i], 0))
 			return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
 		i++;
 	}

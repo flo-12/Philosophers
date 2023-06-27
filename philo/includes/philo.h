@@ -29,7 +29,7 @@
 *                                     Macros                                  *
 ******************************************************************************/
 
-# define DEBUG_MSG 1
+# define DEBUG_MSG 0
 # define START_DELAY 100
 # define MAX_PHILOS 300
 # define STR_MAX_PHILOS "300"
@@ -73,6 +73,7 @@ typedef struct gen_info
 typedef struct s_mutex
 {
 	pthread_mutex_t		mutex_stop_sim;
+	pthread_mutex_t		*mutex_meals;
 	pthread_mutex_t		mutex_time;
 	pthread_mutex_t		mutex_print;
 	pthread_mutex_t		*forks;

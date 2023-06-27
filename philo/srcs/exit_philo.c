@@ -30,6 +30,8 @@ void	free_mem(t_table *table)
 		free(table->observer);
 	if (table->mutexes && table->mutexes->forks)
 		free(table->mutexes->forks);
+	if (table->mutexes && table->mutexes->mutex_meals)
+		free(table->mutexes->mutex_meals);
 	if (table->mutexes)
 		free(table->mutexes);
 	if (table->gen_info && table->gen_info->n_meals)
@@ -53,7 +55,10 @@ void	destroy_mutex(t_mutex *mutexes, int n_philos)
 	pthread_mutex_destroy(&mutexes->mutex_print);
 	i = -1;
 	while (++i < n_philos)
+	{
 		pthread_mutex_destroy(&mutexes->forks[i]);
+		pthread_mutex_destroy(&mutexes->mutex_meals[i]);
+	}
 }
 
 /* detach_thread:

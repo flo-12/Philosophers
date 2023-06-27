@@ -35,16 +35,16 @@ void	eat_routine(t_philo *philo)
 		print_state(STR_STATE_EAT, philo->t_start, philo->id + 1,
 			&philo->mutexes->mutex_print);
 	}
-	pthread_mutex_lock(&philo->mutexes->mutex_stop_sim);
+	pthread_mutex_lock(&philo->mutexes->mutex_meals[philo->id]);
 	philo->gen_info->t_last_meal[philo->id] = get_time_ms();
 	philo->t_last_meal = philo->gen_info->t_last_meal[philo->id];
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	pthread_mutex_unlock(&philo->mutexes->mutex_meals[philo->id]);
 	philo_wait(philo->time_to_eat, philo);
 	pthread_mutex_unlock(&philo->mutexes->forks[philo->fork[1]]);
 	pthread_mutex_unlock(&philo->mutexes->forks[philo->fork[0]]);
-	pthread_mutex_lock(&philo->mutexes->mutex_stop_sim);
+	pthread_mutex_lock(&philo->mutexes->mutex_meals[philo->id]);
 	philo->gen_info->n_meals[philo->id]++;
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	pthread_mutex_unlock(&philo->mutexes->mutex_meals[philo->id]);
 }
 
 /* sleep_routine:
@@ -97,7 +97,6 @@ void	single_philo_routine(t_philo *philo)
 	pthread_mutex_unlock(&philo->mutexes->forks[philo->fork[0]]);
 }
 
-
 /* philosopher:
 *	Routine for each Philosopher, which calls the function
 *	to eat, think and sleep (in this order) and stops if
@@ -116,7 +115,6 @@ void	*philosopher(void *arg)
 	}
 	time_sync(philo->t_start);
 	if (philo->id % 2 == 1)
-		//sleep_routine(philo);
 		think_routine(philo);
 	while (!get_stop_sim(&philo->gen_info->stop_sim,
 			&philo->mutexes->mutex_stop_sim))
