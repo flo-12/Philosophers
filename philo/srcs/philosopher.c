@@ -108,12 +108,12 @@ void	*philosopher(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
+	time_sync(philo->t_start);
 	if (philo->n_philos == 1)
 	{
 		single_philo_routine(philo);
 		return (NULL);
 	}
-	time_sync(philo->t_start);
 	if (philo->id % 2 == 1)
 		think_routine(philo);
 	while (!get_stop_sim(&philo->gen_info->stop_sim,

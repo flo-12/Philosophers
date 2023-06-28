@@ -86,7 +86,7 @@ bool	init_simulation(t_table *table)
 int	main(int argc, char **argv)
 {
 	t_table	*table;
-// CHECK FOR MEM-LEAKS WITH VALGRIND
+
 	table = NULL;
 	if (!check_input(argc, argv))
 		return (EXIT_FAILURE);
