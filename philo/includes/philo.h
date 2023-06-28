@@ -31,6 +31,7 @@
 
 # define DEBUG_MSG 0
 # define START_DELAY 100
+# define SLEEP_TIME_CHECK 5000
 # define MAX_PHILOS 300
 # define STR_MAX_PHILOS "300"
 # define STR_MAX_U_INT "4294967295"
