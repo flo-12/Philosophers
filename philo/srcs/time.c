@@ -66,7 +66,11 @@ void	philo_wait(unsigned long long time_to_sleep, t_philo *philo)
 	{
 		if (get_stop_sim(&philo->gen_info->stop_sim,
 				&philo->mutexes->mutex_stop_sim))
+		{
+			pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
 			break ;
+		}
+		pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
 		usleep(SLEEP_TIME_CHECK);
 	}
 }

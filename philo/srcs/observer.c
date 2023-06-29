@@ -36,7 +36,7 @@ bool	get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim)
 	pthread_mutex_lock(mutex_stop_sim);
 	if (*stop_sim)
 		state = true;
-	pthread_mutex_unlock(mutex_stop_sim);
+	//pthread_mutex_unlock(mutex_stop_sim);
 	return (state);
 }
 
