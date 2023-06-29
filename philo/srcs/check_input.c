@@ -49,6 +49,22 @@ bool	in_positive_range(char *str, char *max_nbr)
 	return (true);
 }
 
+/* is_zero:
+*	Checks if the str only contains zeros. Also returns false
+*	if str is empty.
+*	Return true if str contains only zeros and false if not.
+*/
+bool	is_zero(char *str)
+{
+	while (*str)
+	{
+		if (*str != '0')
+			return (false);
+		str++;
+	}
+	return (true);
+}
+
 /* is_valid_input:
 *	Check if the user input is valid - with the following rules:
 *		1) min of 4 and max of 5 strings
@@ -75,6 +91,8 @@ bool	check_input(int argc, char **argv)
 			return (printf(STR_ERR_INPUT_DIGIT, argv[i]), false);
 		else if (i == 6 && !in_positive_range(argv[i], STR_MAX_INT))
 			return (printf(STR_ERR_INPUT_DIGIT, argv[i]), false);
+		if (is_zero(argv[i]))
+			return (printf(STR_ERR_ZERO), false);
 	}
 	return (true);
 }

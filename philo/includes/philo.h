@@ -45,6 +45,7 @@ not a valid number - either out of range or contains \
 non-numeric characters.\n"
 # define STR_ERR_INPUT_MAXPHILOS	"invalid input (%s): \
 too many Philosophers (max: %s).\n"
+# define STR_ERR_ZERO	"0 as an input or an empty string is not allowed.\n"
 # define STR_ERR_THREAD	"error: Could not create thread.\n"
 # define STR_ERR_THREAD_DET	"error exiting philo.c: Could not detach thread.\n"
 # define STR_ERR_MALLOC	"error: Could not allocate memory.\n"
@@ -76,7 +77,6 @@ typedef struct s_mutex
 	pthread_mutex_t		mutex_stop_sim;
 	pthread_mutex_t		*mutex_meals;
 	pthread_mutex_t		mutex_time;
-	pthread_mutex_t		mutex_print;
 	pthread_mutex_t		*forks;
 }	t_mutex;
 
@@ -137,8 +137,7 @@ bool				init_philos(t_table *table, char **argv);
 
 // output.c
 void				msg(char *str, char *arg1);
-void				print_state(char *str, unsigned long long t_start, 
-						int id, pthread_mutex_t *mutex_print);
+void				print_state(char *str, t_philo *philo);
 
 // philosopher.c
 void				*philosopher(void *arg);

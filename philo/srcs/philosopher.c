@@ -22,21 +22,10 @@
 void	eat_routine(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->mutexes->forks[philo->fork[0]]);
-	if (!get_stop_sim(&philo->gen_info->stop_sim,
-			&philo->mutexes->mutex_stop_sim))
-		print_state(STR_STATE_FOR, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	print_state(STR_STATE_FOR, philo);
 	pthread_mutex_lock(&philo->mutexes->forks[philo->fork[1]]);
-	if (!get_stop_sim(&philo->gen_info->stop_sim,
-			&philo->mutexes->mutex_stop_sim))
-	{
-		print_state(STR_STATE_FOR, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
-		print_state(STR_STATE_EAT, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
-	}
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	print_state(STR_STATE_FOR, philo);
+	print_state(STR_STATE_EAT, philo);
 	pthread_mutex_lock(&philo->mutexes->mutex_meals[philo->id]);
 	philo->gen_info->t_last_meal[philo->id] = get_time_ms();
 	philo->t_last_meal = philo->gen_info->t_last_meal[philo->id];
@@ -55,11 +44,7 @@ void	eat_routine(t_philo *philo)
 */
 void	sleep_routine(t_philo *philo)
 {
-	if (!get_stop_sim(&philo->gen_info->stop_sim,
-			&philo->mutexes->mutex_stop_sim))
-		print_state(STR_STATE_SLE, philo->t_start,
-			philo->id + 1, &philo->mutexes->mutex_print);
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	print_state(STR_STATE_SLE, philo);
 	philo_wait(philo->time_to_sleep, philo);
 }
 
@@ -70,11 +55,7 @@ void	think_routine(t_philo *philo)
 {
 	unsigned long long	t_think;
 
-	if (!get_stop_sim(&philo->gen_info->stop_sim,
-			&philo->mutexes->mutex_stop_sim))
-		print_state(STR_STATE_THI, philo->t_start, philo->id + 1,
-			&philo->mutexes->mutex_print);
-	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
+	print_state(STR_STATE_THI, philo);
 	t_think = (philo->time_to_die - (get_time_ms() - philo->t_last_meal)) / 2;
 	if (t_think < 100)
 		t_think = 0;
@@ -93,11 +74,9 @@ void	think_routine(t_philo *philo)
 void	single_philo_routine(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->mutexes->forks[philo->fork[0]]);
-	print_state(STR_STATE_FOR, philo->t_start, philo->id + 1,
-		&philo->mutexes->mutex_print);
+	print_state(STR_STATE_FOR, philo);
 	philo_wait(philo->time_to_die, philo);
-	print_state(STR_STATE_DIE, philo->t_start, philo->id + 1,
-		&philo->mutexes->mutex_print);
+	print_state(STR_STATE_DIE, philo);
 	pthread_mutex_unlock(&philo->mutexes->forks[philo->fork[0]]);
 }
 

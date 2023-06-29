@@ -52,7 +52,6 @@ void	destroy_mutex(t_mutex *mutexes, int n_philos)
 
 	pthread_mutex_destroy(&mutexes->mutex_stop_sim);
 	pthread_mutex_destroy(&mutexes->mutex_time);
-	pthread_mutex_destroy(&mutexes->mutex_print);
 	i = -1;
 	while (++i < n_philos)
 	{

@@ -102,8 +102,6 @@ bool	init_mutexes(t_table *table)
 		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
 	if (pthread_mutex_init(&table->mutexes->mutex_time, 0))
 		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
-	if (pthread_mutex_init(&table->mutexes->mutex_print, 0))
-		return (exit_philo(-1, table, STR_ERR_MUTEX, NULL), false);
 	return (true);
 }
 

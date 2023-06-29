@@ -36,7 +36,6 @@ bool	get_stop_sim(bool *stop_sim, pthread_mutex_t *mutex_stop_sim)
 	pthread_mutex_lock(mutex_stop_sim);
 	if (*stop_sim)
 		state = true;
-	//pthread_mutex_unlock(mutex_stop_sim);
 	return (state);
 }
 
@@ -67,10 +66,9 @@ bool	min_meals_reached(t_observer *observer)
 	}
 	pthread_mutex_lock(&observer->mutexes->mutex_stop_sim);
 	set_stop_sim(&observer->gen_info->stop_sim, true);
-	pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 	if (DEBUG_MSG)
-		print_state(STR_STATE_MEA, observer->t_start, -1,
-			&observer->mutexes->mutex_print);
+		printf(STR_STATE_MEA, get_time_ms() - observer->t_start);
+	pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 	return (true);
 }
 
@@ -97,8 +95,7 @@ bool	pihlo_starved(t_observer *observer)
 			pthread_mutex_unlock(&observer->mutexes->mutex_meals[i]);
 			pthread_mutex_lock(&observer->mutexes->mutex_stop_sim);
 			set_stop_sim(&observer->gen_info->stop_sim, true);
-			print_state(STR_STATE_DIE, observer->t_start, i + 1,
-				&observer->mutexes->mutex_print);
+			printf(STR_STATE_DIE, get_time_ms() - observer->t_start, i + 1);
 			pthread_mutex_unlock(&observer->mutexes->mutex_stop_sim);
 			return (true);
 		}

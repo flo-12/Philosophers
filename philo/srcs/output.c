@@ -30,19 +30,10 @@ void	msg(char *str, char *arg1)
 *	Only prints out the state if the simulation shouldn't be
 *	stopped.
 */
-void	print_state(char *str, unsigned long long t_start,
-	int id, pthread_mutex_t *mutex_print)
+void	print_state(char *str, t_philo *philo)
 {
-	if (id >= 0)
-	{
-		pthread_mutex_lock(mutex_print);
-		printf(str, get_time_ms() - t_start, id);
-		pthread_mutex_unlock(mutex_print);
-	}
-	else
-	{
-		pthread_mutex_lock(mutex_print);
-		printf(str, get_time_ms() - t_start);
-		pthread_mutex_unlock(mutex_print);
-	}
+	if (!get_stop_sim(&philo->gen_info->stop_sim,
+			&philo->mutexes->mutex_stop_sim))
+		printf(str, get_time_ms() - philo->t_start, philo->id + 1);
+	pthread_mutex_unlock(&philo->mutexes->mutex_stop_sim);
 }
