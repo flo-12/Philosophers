@@ -1,4 +1,6 @@
 # Philosophers
+> Eat, Sleep, Spaghetti, repeat. This project is about learning how threads work by precisely timing a group of philosophers on when to pick up forks and eat spaghetti without dying from hunger.
+
 Welcome to a famous problem in Computer Science, formulated by Edsger Dijkstra in 1965, the **dining philosophers problem**. It is an introduction in concurrent programming.
 The problem statement in our case goes as followed:
 - One or more philosophers sit at a round table.
