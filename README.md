@@ -38,9 +38,9 @@ _Additionally, data races have to be avoided._
 *Note that the program is written with Linux. Other operating systems were not tested.*
 
 ## Installing and Compiling
-1) Clone the repository and its submodule by ``` git clone --recursive <project SSH/URL> ```
+1) Clone the repository by ``` git clone <project SSH/URL> ```
 2) direct to the cloned folder ```cd <folder_name>```
-3) ```make``` (automatically compiles the libft)
+3) ```make```
 
 
 ## Execution
