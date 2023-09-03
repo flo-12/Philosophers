@@ -7,6 +7,6 @@
 *.a
 
 # Executables
-philo/philo
+philo
 *.out
 

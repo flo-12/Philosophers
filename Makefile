@@ -35,7 +35,6 @@ OBJ_FILE	= $(SRC_FILE:.c=.o)
 OBJ			= $(addprefix $(OBJ_PATH), $(OBJ_FILE))
 
 # RULES
-
 all: $(OBJ_PATH) $(NAME)
 
 $(NAME): $(OBJ)
