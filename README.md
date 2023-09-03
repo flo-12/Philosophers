@@ -25,10 +25,16 @@ Examples:
 
 Note: The mutexes lead to a delay during execution. High numbers of philosophers (way above 200) can lead to unexpected deaths a philosophers.
 
+## Check Leaks
+
+
 # Sources
-The following list is a recommendation of sources for anyone who wants to know more about the topic:
+The following list is a recommendation of sources for anyone who wants to know more about the topics:
 | Topic								| Link                                                        	|
 |----------------------------------:|:--------------------------------------------------------------|
+| Intro Dining Philosophers Problem | [Wikipedia - Dining philosophers problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem) |
 | Video Tutorial | [C program for dining philosophers problem using semaphore and mutex in operating system](https://www.youtube.com/watch?v=1LgFnXFpNMg) |
 | Video Tutorial Threads | [Program to Pass Parameters to a Thread](https://www.youtube.com/watch?v=60NBJxX9n-M) |
 | Intro about threads and mutexes | [Threads, Mutexes and Concurrent Programming in C](https://www.codequoi.com/en/threads-mutexes-and-concurrent-programming-in-c/) |
+| man pages pthread_mutex_* | [pthread_mutex_init](https://linux.die.net/man/3/pthread_mutex_init), [pthread_mutex_lock](https://linux.die.net/man/3/pthread_mutex_lock), [pthread_mutex_unlock](https://linux.die.net/man/3/pthread_mutex_unlock) |
+| man pages pthread_* | [pthread_create](https://man7.org/linux/man-pages/man3/pthread_create.3.html), [pthread_join](https://man7.org/linux/man-pages/man3/pthread_join.3.html), [pthread_detach](https://man7.org/linux/man-pages/man3/pthread_detach.3.html) |
